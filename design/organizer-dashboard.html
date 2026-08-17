@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard do Organizador — Verzel Events</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">Verzel<span>.</span></a>
+      <div class="nav-actions">
+        <a href="create-event.html" class="btn btn-primary">Criar evento</a>
+        <a href="#" class="btn btn-ghost">Minha conta</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h1>Painel do organizador</h1>
+          <p class="text-muted text-sm">Acompanhe seus eventos e vendas</p>
+        </div>
+      </div>
+
+      <div class="grid grid-4" style="margin-bottom: 32px;">
+        <div class="card stat-card">
+          <div class="stat-value">5</div>
+          <div class="stat-label">Eventos publicados</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value">1.240</div>
+          <div class="stat-label">Ingressos vendidos</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value">R$ 89K</div>
+          <div class="stat-label">Receita bruta</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value">98%</div>
+          <div class="stat-label">Taxa de validação</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 24px;">
+        <div class="flex justify-between items-center" style="margin-bottom: 24px;">
+          <h3>Meus eventos</h3>
+          <div class="flex gap-2">
+            <select class="form-select" style="width: 140px; height: 40px;">
+              <option>Todos</option>
+              <option>Publicados</option>
+              <option>Rascunhos</option>
+            </select>
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: var(--color-text-muted);">Evento</th>
+              <th style="text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: var(--color-text-muted);">Data</th>
+              <th style="text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: var(--color-text-muted);">Ingressos</th>
+              <th style="text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: var(--color-text-muted);">Status</th>
+              <th style="text-align: right; padding: 12px; font-size: 12px; text-transform: uppercase; color: var(--color-text-muted);">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <td style="padding: 16px 12px;">
+                <strong>Festival Verano 2026</strong>
+                <p class="text-muted text-xs">São Paulo, SP</p>
+              </td>
+              <td style="padding: 16px 12px;" class="text-sm">15 Ago 2026</td>
+              <td style="padding: 16px 12px;" class="text-sm">1.050 / 5.000</td>
+              <td style="padding: 16px 12px;"><span class="badge badge-success">Publicado</span></td>
+              <td style="padding: 16px 12px; text-align: right;"><button class="btn btn-ghost btn-sm">Editar</button></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <td style="padding: 16px 12px;">
+                <strong>MPB ao Vivo</strong>
+                <p class="text-muted text-xs">Curitiba, PR</p>
+              </td>
+              <td style="padding: 16px 12px;" class="text-sm">22 Ago 2026</td>
+              <td style="padding: 16px 12px;" class="text-sm">190 / 400</td>
+              <td style="padding: 16px 12px;"><span class="badge badge-success">Publicado</span></td>
+              <td style="padding: 16px 12px; text-align: right;"><button class="btn btn-ghost btn-sm">Editar</button></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <td style="padding: 16px 12px;">
+                <strong>Cine Clássico: O Poderoso Chefão</strong>
+                <p class="text-muted text-xs">Rio de Janeiro, RJ</p>
+              </td>
+              <td style="padding: 16px 12px;" class="text-sm">—</td>
+              <td style="padding: 16px 12px;" class="text-sm">—</td>
+              <td style="padding: 16px 12px;"><span class="badge badge-primary">Rascunho</span></td>
+              <td style="padding: 16px 12px; text-align: right;"><button class="btn btn-ghost btn-sm">Editar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">Verzel<span>.</span></a>
+        <p class="text-muted text-sm">Plataforma de eventos e ingressos com experiência completa do organizador à portaia.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">Compradores</h4>
+        <ul class="footer-links"><li><a href="#">Como comprar</a></li><li><a href="#">Meus ingressos</a></li><li><a href="#">Central de ajuda</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Organizadores</h4>
+        <ul class="footer-links"><li><a href="#">Criar evento</a></li><li><a href="#">Painel</a></li><li><a href="#">API</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Verzel</h4>
+        <ul class="footer-links"><li><a href="#">Sobre</a></li><li><a href="#">Termos</a></li><li><a href="#">Privacidade</a></li></ul>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

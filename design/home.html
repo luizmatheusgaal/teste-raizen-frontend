@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home — Verzel Events</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">Verzel<span>.</span></a>
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar eventos, shows, filmes..." />
+      </div>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-ghost">Criar evento</a>
+        <a href="#" class="btn btn-primary">Entrar</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Descubra o que fazer perto de você</h1>
+      <p>Shows, filmes, teatros e experiências. Reserve seu lugar e receba seu ingresso com QR.</p>
+      <div class="flex gap-4 mt-6">
+        <a href="#" class="btn btn-lg" style="background:white;color:var(--color-primary)">Explorar eventos</a>
+        <a href="#" class="btn btn-ghost" style="color:white">Sou organizador</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2>Eventos em destaque</h2>
+          <p class="text-muted text-sm">Os mais comprados nas últimas 24 horas</p>
+        </div>
+        <a href="#" class="btn btn-ghost">Ver todos</a>
+      </div>
+      <div class="grid grid-4">
+        <article class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, #16A34A 0%, #15803D 100%)">
+            <span class="badge badge-accent">Show</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Festival Verano 2026</h3>
+            <div class="card-meta">
+              <span>15 Ago • 20:00</span>
+              <span>São Paulo, SP</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-price">R$ 120</span>
+              <span class="badge badge-success">Disponível</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%)">
+            <span class="badge badge-primary">Cinema</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Cine Clássico: O Poderoso Chefão</h3>
+            <div class="card-meta">
+              <span>18 Ago • 19:00</span>
+              <span>Rio de Janeiro, RJ</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-price">R$ 45</span>
+              <span class="badge badge-success">Disponível</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%)">
+            <span class="badge badge-primary">Teatro</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Hamlet — Temporada 2026</h3>
+            <div class="card-meta">
+              <span>20 Ago • 21:00</span>
+              <span>Belo Horizonte, MG</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-price">R$ 80</span>
+              <span class="badge badge-success">Disponível</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, #86EFAC 0%, #4ADE80 100%)">
+            <span class="badge badge-accent">Show</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">MPB ao Vivo</h3>
+            <div class="card-meta">
+              <span>22 Ago • 19:30</span>
+              <span>Curitiba, PR</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-price">R$ 95</span>
+              <span class="badge badge-danger">Esgotado</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2>Navegue por categoria</h2>
+          <p class="text-muted text-sm">Encontre o evento ideal para você</p>
+        </div>
+      </div>
+      <div class="grid grid-4">
+        <div class="card" style="padding: 24px; text-align: center;">
+          <h4 style="margin-bottom: 4px">Festas e Shows</h4>
+          <p class="text-muted text-sm">123 eventos</p>
+        </div>
+        <div class="card" style="padding: 24px; text-align: center;">
+          <h4 style="margin-bottom: 4px">Teatros e Espetáculos</h4>
+          <p class="text-muted text-sm">45 eventos</p>
+        </div>
+        <div class="card" style="padding: 24px; text-align: center;">
+          <h4 style="margin-bottom: 4px">Cinema</h4>
+          <p class="text-muted text-sm">67 eventos</p>
+        </div>
+        <div class="card" style="padding: 24px; text-align: center;">
+          <h4 style="margin-bottom: 4px">Cursos e Workshops</h4>
+          <p class="text-muted text-sm">34 eventos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">Verzel<span>.</span></a>
+        <p class="text-muted text-sm">Plataforma de eventos e ingressos com experiência completa do organizador à portaia.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">Compradores</h4>
+        <ul class="footer-links"><li><a href="#">Como comprar</a></li><li><a href="#">Meus ingressos</a></li><li><a href="#">Central de ajuda</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Organizadores</h4>
+        <ul class="footer-links"><li><a href="#">Criar evento</a></li><li><a href="#">Painel</a></li><li><a href="#">API</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Verzel</h4>
+        <ul class="footer-links"><li><a href="#">Sobre</a></li><li><a href="#">Termos</a></li><li><a href="#">Privacidade</a></li></ul>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

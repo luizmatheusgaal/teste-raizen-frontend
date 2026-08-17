@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Criar Evento — Verzel Events</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">Verzel<span>.</span></a>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-ghost">Dashboard</a>
+        <a href="#" class="btn btn-primary">Minha conta</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container" style="max-width: 960px;">
+      <div class="section-header">
+        <div>
+          <h1>Criar novo evento</h1>
+          <p class="text-muted text-sm">Escolha um show ou filme do catálogo e defina data, local e preço</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 32px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px;">1. Buscar no catálogo externo</h4>
+        <div class="flex gap-4" style="margin-bottom: 16px;">
+          <select class="form-select" style="max-width: 200px;">
+            <option>Ticketmaster</option>
+            <option>TMDb</option>
+          </select>
+          <input class="form-input" type="text" placeholder="Buscar show ou filme..." />
+          <button class="btn btn-primary">Buscar</button>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card" style="cursor: pointer; border: 2px solid var(--color-primary);">
+            <div class="card-image" style="height: 140px; background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);"></div>
+            <div class="card-body">
+              <h4 style="margin-bottom: 4px;">Festival Verano 2026</h4>
+              <p class="text-muted text-xs">Show • Selecionado</p>
+            </div>
+          </div>
+          <div class="card" style="cursor: pointer;">
+            <div class="card-image" style="height: 140px; background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);"></div>
+            <div class="card-body">
+              <h4 style="margin-bottom: 4px;">Cine Clássico</h4>
+              <p class="text-muted text-xs">Cinema</p>
+            </div>
+          </div>
+          <div class="card" style="cursor: pointer;">
+            <div class="card-image" style="height: 140px; background: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%);"></div>
+            <div class="card-body">
+              <h4 style="margin-bottom: 4px;">Hamlet</h4>
+              <p class="text-muted text-xs">Teatro</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 32px;">
+        <h4 style="margin-bottom: 24px;">2. Configurar evento</h4>
+        <div class="grid grid-2" style="gap: 24px;">
+          <div class="form-group">
+            <label class="form-label">Data e hora</label>
+            <input class="form-input" type="datetime-local" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Local / Venue</label>
+            <select class="form-select">
+              <option>Arena Verzel</option>
+              <option>Cine Verzel</option>
+              <option>Teatro Positivo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capacidade total</label>
+            <input class="form-input" type="number" value="5000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preço base (R$)</label>
+            <input class="form-input" type="number" value="120.00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de venda</label>
+            <select class="form-select">
+              <option>Mapa de assentos</option>
+              <option>Quantidade por setor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status inicial</label>
+            <select class="form-select">
+              <option>Rascunho</option>
+              <option>Publicado</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: 8px;">
+          <label class="form-label">Descrição</label>
+          <textarea class="form-textarea" rows="4">O maior encontro de música independente do ano.</textarea>
+        </div>
+        <div class="flex justify-between items-center mt-6">
+          <button class="btn btn-secondary">Salvar rascunho</button>
+          <button class="btn btn-primary btn-lg">Publicar evento</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">Verzel<span>.</span></a>
+        <p class="text-muted text-sm">Plataforma de eventos e ingressos com experiência completa do organizador à portaia.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">Compradores</h4>
+        <ul class="footer-links"><li><a href="#">Como comprar</a></li><li><a href="#">Meus ingressos</a></li><li><a href="#">Central de ajuda</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Organizadores</h4>
+        <ul class="footer-links"><li><a href="#">Criar evento</a></li><li><a href="#">Painel</a></li><li><a href="#">API</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Verzel</h4>
+        <ul class="footer-links"><li><a href="#">Sobre</a></li><li><a href="#">Termos</a></li><li><a href="#">Privacidade</a></li></ul>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

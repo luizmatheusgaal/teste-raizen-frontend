@@ -1,0 +1,109 @@
+graph TB
+    %% Configuração visual
+    direction TB
+
+    subgraph Vite["Vite + React"]
+        Main[main.tsx]
+        App[App.tsx]
+        Router[BrowserRouter / Routes]
+        Config[config: axios base URL, env vars]
+    end
+
+    subgraph ContextProviders["Context Providers"]
+        AuthContext[AuthContext]
+        CartContext[CartContext]
+        ToastContext[ToastContext]
+    end
+
+    subgraph Services["Camada de Serviços"]
+        ApiClient[apiClient<br/>axios instance]
+        AuthService[authService]
+        EventService[eventService]
+        DiscoveryService[discoveryService<br/>TMDB/Ticketmaster]
+        TicketService[ticketService]
+        PaymentService[paymentService]
+    end
+
+    subgraph Hooks["Custom Hooks"]
+        UseAuth[useAuth]
+        UseEvents[useEvents]
+        UseEventDetail[useEventDetail]
+        UseSeatMap[useSeatMap]
+        UseCart[useCart]
+        UsePayment[usePayment]
+        UseTickets[useTickets]
+        UseQRReader[useQRReader]
+    end
+
+    subgraph Pages["Páginas / Rotas"]
+        Home[HomePage]
+        Login[LoginPage]
+        Register[RegisterPage]
+        EventList[EventListPage]
+        EventDetail[EventDetailPage]
+        EventForm[EventCreateEditPage]
+        Checkout[CheckoutPage]
+        MyTickets[MyTicketsPage]
+        TicketDetail[TicketDetailPage]
+        DoorValidation[DoorValidationPage]
+    end
+
+    subgraph Components["Componentes Compartilhados"]
+        Header[Header]
+        Footer[Footer]
+        EventCard[EventCard]
+        SearchFilter[SearchFilter]
+        SeatMap[SeatMap]
+        TicketQR[TicketQR]
+        QRScanner[QRScanner]
+        PaymentForm[PaymentForm]
+        ProtectedRoute[ProtectedRoute]
+    end
+
+    Main --> App
+    App --> Router
+    App --> AuthContext
+    App --> CartContext
+    App --> ToastContext
+    Router --> ProtectedRoute
+
+    ProtectedRoute --> Home
+    ProtectedRoute --> EventList
+    ProtectedRoute --> EventDetail
+    ProtectedRoute --> EventForm
+    ProtectedRoute --> Checkout
+    ProtectedRoute --> MyTickets
+    ProtectedRoute --> TicketDetail
+    ProtectedRoute --> DoorValidation
+    Router --> Login
+    Router --> Register
+
+    AuthContext --> UseAuth
+    CartContext --> UseCart
+
+    ApiClient --> AuthService
+    ApiClient --> EventService
+    ApiClient --> TicketService
+    ApiClient --> PaymentService
+    DiscoveryService --> EventService
+
+    UseAuth --> AuthService
+    UseEvents --> EventService
+    UseEventDetail --> EventService
+    UseSeatMap --> EventService
+    UseCart --> TicketService
+    UsePayment --> PaymentService
+    UseTickets --> TicketService
+    UseQRReader --> QRScanner
+
+    Home --> Header
+    Home --> Footer
+    Home --> SearchFilter
+    Home --> EventCard
+    EventList --> EventCard
+    EventList --> SearchFilter
+    EventDetail --> SeatMap
+    Checkout --> PaymentForm
+    MyTickets --> TicketQR
+    TicketDetail --> TicketQR
+    DoorValidation --> QRScanner

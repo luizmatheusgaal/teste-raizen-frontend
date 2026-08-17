@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout — Verzel Events</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">Verzel<span>.</span></a>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-ghost">Meus ingressos</a>
+        <a href="#" class="btn btn-primary">Entrar</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <h1 style="margin-bottom: 8px;">Finalizar compra</h1>
+      <p class="text-muted" style="margin-bottom: 32px;">Revisão do pedido e pagamento simulado</p>
+
+      <div class="grid grid-2" style="gap: 32px; align-items: start;">
+        <div class="card" style="padding: 32px;">
+          <h3 style="margin-bottom: 24px;">Resumo do pedido</h3>
+          <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+            <div style="width: 120px; height: 80px; border-radius: 8px; background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);"></div>
+            <div>
+              <h4 style="margin-bottom: 4px;">Festival Verano 2026</h4>
+              <p class="text-muted text-sm">15 Ago • 20:00 • São Paulo, SP</p>
+              <p class="text-sm">Pista • 1 ingresso</p>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--color-border); padding-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="flex justify-between text-sm"><span class="text-muted">1x Ingresso Pista</span><span>R$ 120,00</span></div>
+            <div class="flex justify-between text-sm"><span class="text-muted">Taxa de serviço</span><span>R$ 12,00</span></div>
+            <div class="flex justify-between" style="font-size: 18px; font-weight: 700; margin-top: 8px;">
+              <span>Total</span>
+              <span style="color: var(--color-secondary);">R$ 132,00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 32px;">
+          <h3 style="margin-bottom: 24px;">Dados do pagamento</h3>
+          <div class="form-group">
+            <label class="form-label">Nome no cartão</label>
+            <input class="form-input" type="text" value="João Silva" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Número do cartão</label>
+            <input class="form-input" type="text" value="4111 1111 1111 1111" />
+          </div>
+          <div class="grid grid-2" style="gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Validade</label>
+              <input class="form-input" type="text" value="12/28" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input class="form-input" type="text" value="123" />
+            </div>
+          </div>
+
+          <div style="background: var(--color-background); border-radius: 8px; padding: 16px; margin: 24px 0;">
+            <p class="text-sm text-muted" style="margin-bottom: 8px;">Ambiente de testes — escolha o resultado simulado:</p>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-2 text-sm"><input type="radio" name="payment" checked /> Aprovar pagamento</label>
+              <label class="flex items-center gap-2 text-sm"><input type="radio" name="payment" /> Recusar pagamento</label>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg w-full" style="margin-bottom: 12px;">Pagar R$ 132,00</button>
+          <p class="text-xs text-muted text-center">Pagamento processado de forma simulada. Nenhuma cobrança real será efetuada.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo" style="margin-bottom: 16px; display: inline-block;">Verzel<span>.</span></a>
+        <p class="text-muted text-sm">Plataforma de eventos e ingressos com experiência completa do organizador à portaia.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">Compradores</h4>
+        <ul class="footer-links"><li><a href="#">Como comprar</a></li><li><a href="#">Meus ingressos</a></li><li><a href="#">Central de ajuda</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Organizadores</h4>
+        <ul class="footer-links"><li><a href="#">Criar evento</a></li><li><a href="#">Painel</a></li><li><a href="#">API</a></li></ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Verzel</h4>
+        <ul class="footer-links"><li><a href="#">Sobre</a></li><li><a href="#">Termos</a></li><li><a href="#">Privacidade</a></li></ul>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
