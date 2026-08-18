@@ -6,6 +6,7 @@ import EventDetail from './pages/EventDetail';
 import Checkout from './pages/Checkout';
 import MyTickets from './pages/MyTickets';
 import DoorValidation from './pages/DoorValidation';
+import CreateEvent from './pages/CreateEvent';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/meus-ingressos" element={<MyTickets />} />
           <Route path="/validar" element={<DoorValidation />} />
+          <Route path="/criar-evento" element={<CreateEvent />} />
         </Routes>
       </Layout>
     </BrowserRouter>
