@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 
-export default function Header({ role = 'guest' }) {
+export default function Header() {
   const location = useLocation();
   const isDoor = location.pathname === '/validar';
+  const isOrganizer = ['/organizador', '/criar-evento'].includes(location.pathname);
 
   return (
     <header className="header">
@@ -16,7 +17,7 @@ export default function Header({ role = 'guest' }) {
           <input type="text" placeholder="Buscar eventos, shows, filmes..." />
         </div>
         <div className="nav-actions">
-          {role === 'organizer' && <Link to="/criar-evento" className="btn btn-ghost">Criar evento</Link>}
+          {isOrganizer && <Link to="/criar-evento" className="btn btn-ghost">Criar evento</Link>}
           {isDoor && <span className="text-sm text-muted">Portaria — Arena Verzel</span>}
           <Link to="/login" className="btn btn-primary">Entrar</Link>
         </div>
