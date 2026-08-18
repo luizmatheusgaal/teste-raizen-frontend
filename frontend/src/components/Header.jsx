@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Header({ role = 'guest' }) {
+  const location = useLocation();
+  const isDoor = location.pathname === '/validar';
+
   return (
     <header className="header">
       <div className="container header-inner">
@@ -14,7 +17,7 @@ export default function Header({ role = 'guest' }) {
         </div>
         <div className="nav-actions">
           {role === 'organizer' && <Link to="/criar-evento" className="btn btn-ghost">Criar evento</Link>}
-          {role === 'door' && <span className="text-sm text-muted">Portaria</span>}
+          {isDoor && <span className="text-sm text-muted">Portaria — Arena Verzel</span>}
           <Link to="/login" className="btn btn-primary">Entrar</Link>
         </div>
       </div>
