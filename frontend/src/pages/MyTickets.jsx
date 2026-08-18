@@ -1,6 +1,6 @@
 import { userTickets } from '../data/events';
 
-function QRCode({ code, used }) {
+function QRCode({ used }) {
   return (
     <svg
       width="96"
