@@ -11,7 +11,6 @@ export default function Checkout() {
   const [paymentResult, setPaymentResult] = useState('approve');
   const [paid, setPaid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   if (!event || !ticketType) {
     return (
@@ -30,7 +29,6 @@ export default function Checkout() {
 
   const handlePayment = async (e) => {
     e.preventDefault();
-    setError('');
 
     if (paymentResult !== 'approve') {
       alert('Pagamento recusado. Tente outro cartão.');
@@ -45,8 +43,8 @@ export default function Checkout() {
       await api.payOrder(order.id);
       setPaid(true);
       setTimeout(() => navigate('/meus-ingressos'), 2000);
-    } catch (err) {
-      setError(err.message || 'Erro ao processar pagamento');
+    } catch {
+      // errors are shown by the global toast
     } finally {
       setLoading(false);
     }
@@ -70,8 +68,6 @@ export default function Checkout() {
       <div className="container">
         <h1 style={{ marginBottom: '8px' }}>Finalizar compra</h1>
         <p className="text-muted" style={{ marginBottom: '32px' }}>Revisão do pedido e pagamento simulado</p>
-
-        {error && <p className="text-danger" style={{ marginBottom: '16px' }}>{error}</p>}
 
         <div className="grid grid-2" style={{ gap: '32px', alignItems: 'start' }}>
           <div className="card" style={{ padding: '32px' }}>
