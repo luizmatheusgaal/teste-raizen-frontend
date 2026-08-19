@@ -1,9 +1,34 @@
+import { notifyToast } from './toast.js';
+
 const PROD_URL = 'https://teste-raizen-backend.vercel.app/api/v1';
 const rawUrl = import.meta.env.VITE_API_BASE_URL || PROD_URL;
 const API_BASE_URL = /^https?:\/\//.test(rawUrl) ? rawUrl : PROD_URL;
 
 function getToken() {
   return localStorage.getItem('verzel_token');
+}
+
+function extractErrorMessage(data, status) {
+  if (data.detail) {
+    return typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+  }
+  if (data.message) {
+    return data.message;
+  }
+  if (typeof data === 'object' && data !== null) {
+    const messages = [];
+    for (const value of Object.values(data)) {
+      if (Array.isArray(value)) {
+        messages.push(value.join(', '));
+      } else if (typeof value === 'string') {
+        messages.push(value);
+      }
+    }
+    if (messages.length) {
+      return messages.join(' ');
+    }
+  }
+  return `Erro ${status}`;
 }
 
 export async function apiRequest(path, options = {}) {
@@ -26,7 +51,9 @@ export async function apiRequest(path, options = {}) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const error = new Error(data.detail || data.message || `Erro ${response.status}`);
+    const message = extractErrorMessage(data, response.status);
+    notifyToast(message, 'error', 4000);
+    const error = new Error(message);
     error.status = response.status;
     error.data = data;
     throw error;

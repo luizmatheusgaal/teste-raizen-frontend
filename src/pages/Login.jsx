@@ -9,14 +9,12 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -37,8 +35,8 @@ export default function Login() {
       if (user.role === 'door') navigate('/validar');
       else if (user.role === 'organizer') navigate('/organizador');
       else navigate('/meus-ingressos');
-    } catch (err) {
-      setError(err.message || 'Erro ao autenticar');
+    } catch {
+      // errors are shown by the global toast
     } finally {
       setLoading(false);
     }
@@ -52,12 +50,6 @@ export default function Login() {
             <h2 style={{ marginBottom: '8px' }}>{isRegister ? 'Criar conta' : 'Bem-vindo de volta'}</h2>
             <p className="text-muted text-sm">Entre como Cliente, Organizador ou Portaria</p>
           </div>
-
-          {error && (
-            <div className="card" style={{ padding: '12px 16px', marginBottom: '16px', background: 'rgba(244, 63, 94, 0.1)', color: 'var(--color-danger)' }}>
-              <p className="text-sm">{error}</p>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit}>
             {isRegister && (

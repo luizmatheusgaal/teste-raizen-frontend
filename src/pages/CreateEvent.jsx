@@ -7,7 +7,6 @@ export default function CreateEvent() {
   const [categories, setCategories] = useState([]);
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -31,8 +30,8 @@ export default function CreateEvent() {
         setVenues(vs);
         if (cats.length) setForm(f => ({ ...f, category_id: cats[0].id }));
         if (vs.length) setForm(f => ({ ...f, venue_id: vs[0].id }));
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        // errors are shown by the global toast
       }
     }
     load();
@@ -40,7 +39,6 @@ export default function CreateEvent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -64,8 +62,8 @@ export default function CreateEvent() {
       });
 
       navigate('/organizador');
-    } catch (err) {
-      setError(err.message);
+    } catch {
+      // errors are shown by the global toast
     } finally {
       setLoading(false);
     }
@@ -76,8 +74,6 @@ export default function CreateEvent() {
       <div className="container" style={{ maxWidth: '960px' }}>
         <h1 style={{ marginBottom: '8px' }}>Criar novo evento</h1>
         <p className="text-muted" style={{ marginBottom: '32px' }}>Preencha as informações do evento e defina o ingresso principal</p>
-
-        {error && <p className="text-danger" style={{ marginBottom: '16px' }}>{error}</p>}
 
         <div className="card" style={{ padding: '32px' }}>
           <form onSubmit={handleSubmit}>

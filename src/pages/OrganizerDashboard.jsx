@@ -8,7 +8,6 @@ export default function OrganizerDashboard() {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -16,8 +15,8 @@ export default function OrganizerDashboard() {
         const data = await api.listEvents();
         const all = data.results || data;
         setEvents(all.filter(e => e.organizer === user?.id));
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        // errors are shown by the global toast
       } finally {
         setLoading(false);
       }
@@ -37,7 +36,6 @@ export default function OrganizerDashboard() {
   ];
 
   if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando...</p></div></section>;
-  if (error) return <section className="section"><div className="container"><p className="text-danger">{error}</p></div></section>;
 
   return (
     <section className="section">

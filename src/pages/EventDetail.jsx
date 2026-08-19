@@ -11,7 +11,6 @@ export default function EventDetail() {
   const [selectedType, setSelectedType] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -24,8 +23,8 @@ export default function EventDetail() {
         const types = typesData.results || typesData;
         setTicketTypes(types);
         if (types.length) setSelectedType(types[0]);
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        // errors are shown by the global toast
       } finally {
         setLoading(false);
       }
@@ -45,7 +44,7 @@ export default function EventDetail() {
   };
 
   if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando...</p></div></section>;
-  if (error || !event) return <section className="section"><div className="container"><p className="text-danger">{error || 'Evento não encontrado.'}</p></div></section>;
+  if (!event) return <section className="section"><div className="container"><p className="text-danger">Evento não encontrado.</p></div></section>;
 
   const { available, soldOut } = eventStatus(event);
   const city = event.venue ? `${event.venue.city}, ${event.venue.state}` : '';

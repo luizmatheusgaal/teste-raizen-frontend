@@ -8,7 +8,6 @@ export default function Home() {
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState(staticCategories);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -19,8 +18,8 @@ export default function Home() {
         if (catData.results?.length || catData.length) {
           setCategories(catData.results || catData);
         }
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        // errors are shown by the global toast
       } finally {
         setLoading(false);
       }
@@ -55,7 +54,6 @@ export default function Home() {
             <Link to="/" className="btn btn-ghost">Ver todos</Link>
           </div>
 
-          {error && <p className="text-danger">{error}</p>}
           {loading ? (
             <p className="text-muted">Carregando eventos...</p>
           ) : (

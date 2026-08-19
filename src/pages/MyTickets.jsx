@@ -26,15 +26,14 @@ function QRCode({ used }) {
 export default function MyTickets() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
       try {
         const data = await api.listTickets();
         setTickets(data.results || data);
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        // errors are shown by the global toast
       } finally {
         setLoading(false);
       }
@@ -43,7 +42,6 @@ export default function MyTickets() {
   }, []);
 
   if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando ingressos...</p></div></section>;
-  if (error) return <section className="section"><div className="container"><p className="text-danger">{error}</p></div></section>;
 
   return (
     <section className="section">
