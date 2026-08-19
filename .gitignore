@@ -177,6 +177,7 @@ node_modules/
 # Vite / React
 dist-ssr
 *.local
+.commit-time
 .vscode/*
 !.vscode/extensions.json
 .idea

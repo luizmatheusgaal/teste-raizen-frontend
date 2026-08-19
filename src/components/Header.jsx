@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.js';
 
 export default function Header() {
   const location = useLocation();
+  const { user, logout } = useAuth();
   const isDoor = location.pathname === '/validar';
   const isOrganizer = ['/organizador', '/criar-evento'].includes(location.pathname);
 
@@ -19,7 +21,14 @@ export default function Header() {
         <div className="nav-actions">
           {isOrganizer && <Link to="/criar-evento" className="btn btn-ghost">Criar evento</Link>}
           {isDoor && <span className="text-sm text-muted">Portaria — Arena Verzel</span>}
-          <Link to="/login" className="btn btn-primary">Entrar</Link>
+          {user ? (
+            <>
+              <span className="text-sm text-muted">{user.first_name || user.email}</span>
+              <button onClick={logout} className="btn btn-ghost">Sair</button>
+            </>
+          ) : (
+            <Link to="/login" className="btn btn-primary">Entrar</Link>
+          )}
         </div>
       </div>
     </header>

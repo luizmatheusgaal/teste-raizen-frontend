@@ -1,24 +1,54 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { events } from '../data/events';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { api } from '../services/api.js';
+import { formatFullDate, formatTime, formatCurrency } from '../services/format.js';
 
 export default function Checkout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { event, ticketType, quantity } = location.state || {};
+
   const [paymentResult, setPaymentResult] = useState('approve');
   const [paid, setPaid] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const event = events[0];
-  const ticketPrice = event.price;
+  if (!event || !ticketType) {
+    return (
+      <section className="section">
+        <div className="container" style={{ maxWidth: '640px', textAlign: 'center' }}>
+          <p className="text-muted">Nenhum ingresso selecion. Volte para a página do evento.</p>
+          <button onClick={() => navigate('/')} className="btn btn-primary mt-4">Ver eventos</button>
+        </div>
+      </section>
+    );
+  }
+
   const fee = 12;
-  const total = ticketPrice + fee;
+  const subtotal = ticketType.price * quantity;
+  const total = subtotal + fee;
 
-  const handlePayment = (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
-    if (paymentResult === 'approve') {
+    setError('');
+
+    if (paymentResult !== 'approve') {
+      alert('Pagamento recusado. Tente outro cartão.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const order = await api.createOrder({
+        items: [{ ticket_type: ticketType.id, quantity, unit_price: ticketType.price }],
+      });
+      await api.payOrder(order.id);
       setPaid(true);
       setTimeout(() => navigate('/meus-ingressos'), 2000);
-    } else {
-      alert('Pagamento recusado. Tente outro cartão.');
+    } catch (err) {
+      setError(err.message || 'Erro ao processar pagamento');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -28,7 +58,7 @@ export default function Checkout() {
         <div className="container" style={{ maxWidth: '640px', textAlign: 'center' }}>
           <div className="card" style={{ padding: '48px' }}>
             <h2 style={{ color: 'var(--color-success)', marginBottom: '16px' }}>Pagamento confirmado!</h2>
-            <p className="text-muted">Seu ingresso foi gerado e está sendo redirecionado para "Meus ingressos".</p>
+            <p className="text-muted">Seu ingresso foi gerado e está sendo redirecionado para &quot;Meus ingressos&quot;.</p>
           </div>
         </div>
       </section>
@@ -41,24 +71,26 @@ export default function Checkout() {
         <h1 style={{ marginBottom: '8px' }}>Finalizar compra</h1>
         <p className="text-muted" style={{ marginBottom: '32px' }}>Revisão do pedido e pagamento simulado</p>
 
+        {error && <p className="text-danger" style={{ marginBottom: '16px' }}>{error}</p>}
+
         <div className="grid grid-2" style={{ gap: '32px', alignItems: 'start' }}>
           <div className="card" style={{ padding: '32px' }}>
             <h3 style={{ marginBottom: '24px' }}>Resumo do pedido</h3>
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-              <div style={{ width: '120px', height: '80px', borderRadius: '8px', background: event.gradient }}></div>
+              <div style={{ width: '120px', height: '80px', borderRadius: '8px', background: 'var(--color-primary)' }}></div>
               <div>
                 <h4 style={{ marginBottom: '4px' }}>{event.title}</h4>
-                <p className="text-muted text-sm">{event.date} • {event.time} • {event.location}</p>
-                <p className="text-sm">Pista • 1 ingresso</p>
+                <p className="text-muted text-sm">{formatFullDate(event.starts_at)} • {formatTime(event.starts_at)} • {event.venue?.city}</p>
+                <p className="text-sm">{ticketType.name} • {quantity} ingresso(s)</p>
               </div>
             </div>
 
             <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="flex justify-between text-sm"><span className="text-muted">1x Ingresso Pista</span><span>R$ {ticketPrice.toFixed(2).replace('.', ',')}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted">Taxa de serviço</span><span>R$ {fee.toFixed(2).replace('.', ',')}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted">{quantity}x {ticketType.name}</span><span>{formatCurrency(subtotal)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted">Taxa de serviço</span><span>{formatCurrency(fee)}</span></div>
               <div className="flex justify-between" style={{ fontSize: '18px', fontWeight: 700, marginTop: '8px' }}>
                 <span>Total</span>
-                <span style={{ color: 'var(--color-secondary)' }}>R$ {total.toFixed(2).replace('.', ',')}</span>
+                <span style={{ color: 'var(--color-secondary)' }}>{formatCurrency(total)}</span>
               </div>
             </div>
           </div>
@@ -97,8 +129,8 @@ export default function Checkout() {
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-lg w-full" style={{ marginBottom: '12px' }}>
-                Pagar R$ {total.toFixed(2).replace('.', ',')}
+              <button type="submit" className="btn btn-primary btn-lg w-full" style={{ marginBottom: '12px' }} disabled={loading}>
+                {loading ? 'Processando...' : `Pagar ${formatCurrency(total)}`}
               </button>
               <p className="text-xs text-muted text-center">Pagamento processado de forma simulada. Nenhuma cobrança real será efetuada.</p>
             </form>

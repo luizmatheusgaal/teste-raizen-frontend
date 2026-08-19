@@ -1,4 +1,6 @@
-import { userTickets } from '../data/events';
+import { useEffect, useState } from 'react';
+import { api } from '../services/api.js';
+import { formatFullDate, formatTime } from '../services/format.js';
 
 function QRCode({ used }) {
   return (
@@ -22,6 +24,27 @@ function QRCode({ used }) {
 }
 
 export default function MyTickets() {
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await api.listTickets();
+        setTickets(data.results || data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando ingressos...</p></div></section>;
+  if (error) return <section className="section"><div className="container"><p className="text-danger">{error}</p></div></section>;
+
   return (
     <section className="section">
       <div className="container">
@@ -32,34 +55,40 @@ export default function MyTickets() {
           </div>
         </div>
 
-        {userTickets.map(ticket => (
-          <div className="card" key={ticket.id} style={{ padding: '24px', marginBottom: '24px', opacity: ticket.status === 'used' ? 0.7 : 1 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '24px', alignItems: 'center' }}>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`badge ${ticket.status === 'valid' ? 'badge-success' : 'badge-danger'}`}>
-                    {ticket.status === 'valid' ? 'Válido' : 'Utilizado'}
-                  </span>
-                  <span className="text-xs text-muted">Código: {ticket.id}</span>
+        {tickets.length === 0 && <p className="text-muted">Você ainda não possui ingressos.</p>}
+
+        {tickets.map(ticket => {
+          const used = ticket.status === 'used';
+          const event = ticket.ticket_type?.event;
+          return (
+            <div className="card" key={ticket.id} style={{ padding: '24px', marginBottom: '24px', opacity: used ? 0.7 : 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '24px', alignItems: 'center' }}>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`badge ${!used ? 'badge-success' : 'badge-danger'}`}>
+                      {!used ? 'Válido' : 'Utilizado'}
+                    </span>
+                    <span className="text-xs text-muted">Código: {ticket.code}</span>
+                  </div>
+                  <h3>{event?.title || 'Evento'}</h3>
+                  <p className="text-muted text-sm mt-4">{formatFullDate(event?.starts_at)} • {formatTime(event?.starts_at)}</p>
+                  <p className="text-muted text-sm">{event?.venue?.city}, {event?.venue?.state} • {event?.venue?.name}</p>
+                  <p className="text-sm mt-4"><strong>Setor:</strong> {ticket.ticket_type?.name} • <strong>Lugar:</strong> {ticket.seat || 'Livre'}</p>
                 </div>
-                <h3>{ticket.eventTitle}</h3>
-                <p className="text-muted text-sm mt-4">{ticket.date} • {ticket.time}</p>
-                <p className="text-muted text-sm">{ticket.location} • {ticket.venue}</p>
-                <p className="text-sm mt-4"><strong>Setor:</strong> {ticket.sector} • <strong>Lugar:</strong> {ticket.seat}</p>
+                <div style={{ textAlign: 'center' }}>
+                  <QRCode code={ticket.code} used={used} />
+                  {!used && <p className="text-xs text-muted" style={{ marginTop: '8px' }}>Apresente na portaria</p>}
+                </div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <QRCode code={ticket.id} used={ticket.status === 'used'} />
-                {ticket.status === 'valid' && <p className="text-xs text-muted" style={{ marginTop: '8px' }}>Apresente na portaia</p>}
-              </div>
+              {!used && (
+                <div style={{ borderTop: '1px solid var(--color-border)', marginTop: '20px', paddingTop: '16px', display: 'flex', gap: '12px' }}>
+                  <button className="btn btn-secondary btn-sm">Compartilhar ingresso</button>
+                  <button className="btn btn-ghost btn-sm">Baixar PDF</button>
+                </div>
+              )}
             </div>
-            {ticket.status === 'valid' && (
-              <div style={{ borderTop: '1px solid var(--color-border)', marginTop: '20px', paddingTop: '16px', display: 'flex', gap: '12px' }}>
-                <button className="btn btn-secondary btn-sm">Compartilhar ingresso</button>
-                <button className="btn btn-ghost btn-sm">Baixar PDF</button>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

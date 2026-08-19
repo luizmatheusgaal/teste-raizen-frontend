@@ -1,83 +1,106 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { events } from '../data/events';
-
-const SEAT_ROWS = ['A', 'B', 'C'];
-const SEATS_PER_ROW = 7;
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '../services/api.js';
+import { formatFullDate, formatTime, formatCurrency, eventStatus, gradientFor } from '../services/format.js';
 
 export default function EventDetail() {
   const { id } = useParams();
-  const event = events.find(e => e.id === Number(id)) || events[0];
-  const [sector, setSector] = useState('Pista');
+  const navigate = useNavigate();
+  const [event, setEvent] = useState(null);
+  const [ticketTypes, setTicketTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSeats, setSelectedSeats] = useState(['A3', 'A4']);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const toggleSeat = (row, col) => {
-    const seatId = `${row}${col}`;
-    if (seatId === 'B2' || seatId === 'A6' || seatId === 'C4' || seatId === 'C5') return;
-    setSelectedSeats(prev =>
-      prev.includes(seatId) ? prev.filter(s => s !== seatId) : [...prev, seatId]
-    );
+  useEffect(() => {
+    async function load() {
+      try {
+        const [eventData, typesData] = await Promise.all([
+          api.getEvent(id),
+          api.listTicketTypes(id),
+        ]);
+        setEvent(eventData);
+        const types = typesData.results || typesData;
+        setTicketTypes(types);
+        if (types.length) setSelectedType(types[0]);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [id]);
+
+  const handleCheckout = () => {
+    if (!selectedType) return;
+    navigate('/checkout', {
+      state: {
+        event,
+        ticketType: selectedType,
+        quantity,
+      },
+    });
   };
 
-  const isOccupied = (row, col) => {
-    const seatId = `${row}${col}`;
-    return ['B2', 'A6', 'C4', 'C5'].includes(seatId);
-  };
+  if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando...</p></div></section>;
+  if (error || !event) return <section className="section"><div className="container"><p className="text-danger">{error || 'Evento não encontrado.'}</p></div></section>;
 
-  const isSelected = (row, col) => selectedSeats.includes(`${row}${col}`);
-
-  const price = sector === 'Pista' ? event.price : sector === 'Camarote' ? event.price * 2.33 : event.price * 3.75;
-  const total = price * quantity;
+  const { available, soldOut } = eventStatus(event);
+  const city = event.venue ? `${event.venue.city}, ${event.venue.state}` : '';
+  const total = selectedType ? selectedType.price * quantity : 0;
 
   return (
     <>
       <section className="event-hero" style={{ padding: '32px 0', background: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '32px', alignItems: 'start' }}>
-          <div className="card-image" style={{ background: event.gradient, borderRadius: '16px', minHeight: '420px' }}>
-            <span className="badge badge-accent" style={{ top: '16px', left: '16px' }}>{event.category}</span>
+          <div className="card-image" style={{ background: gradientFor(event.id), borderRadius: '16px', minHeight: '420px' }}>
+            <span className="badge badge-accent" style={{ top: '16px', left: '16px' }}>{event.category?.name}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
-              <span className="badge badge-success">Ingressos disponíveis</span>
-              <span className="badge badge-primary">Maiores de 18</span>
+              <span className="badge badge-success">{available ? 'Ingressos disponíveis' : 'Indisponível'}</span>
+              <span className="badge badge-primary">Maiores de {event.min_age || 0}</span>
             </div>
             <h1>{event.title}</h1>
             <p className="text-muted">{event.description}</p>
             <div className="flex gap-4" style={{ flexWrap: 'wrap', color: 'var(--color-text-muted)', fontSize: '14px' }}>
-              <span>📅 {event.fullDate}</span>
-              <span>🕗 {event.time}</span>
-              <span>📍 {event.location}</span>
-              <span>🏟️ {event.venue}</span>
+              <span>📅 {formatFullDate(event.starts_at)}</span>
+              <span>🕗 {formatTime(event.starts_at)}</span>
+              <span>📍 {city}</span>
+              <span>🏟️ {event.venue?.name}</span>
             </div>
 
             <div className="card" style={{ padding: '24px' }}>
               <h4 style={{ marginBottom: '16px' }}>Selecione seus ingressos</h4>
               <div className="grid grid-2" style={{ marginBottom: '16px' }}>
                 <div className="form-group" style={{ margin: 0 }}>
-                  <label className="form-label">Setor</label>
-                  <select className="form-select" value={sector} onChange={(e) => setSector(e.target.value)}>
-                    <option value="Pista">Pista (R$ {event.price})</option>
-                    <option value="Camarote">Camarote (R$ {Math.round(event.price * 2.33)})</option>
-                    <option value="VIP">VIP (R$ {Math.round(event.price * 3.75)})</option>
+                  <label className="form-label">Tipo de ingresso</label>
+                  <select className="form-select" value={selectedType?.id || ''} onChange={(e) => setSelectedType(ticketTypes.find(t => t.id === Number(e.target.value)))}>
+                    {ticketTypes.map(type => (
+                      <option key={type.id} value={type.id}>{type.name} ({formatCurrency(type.price)})</option>
+                    ))}
                   </select>
                 </div>
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label">Quantidade</label>
                   <select className="form-select" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))}>
-                    {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n}</option>)}
+                    {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
               </div>
               <p className="text-sm text-muted" style={{ marginBottom: '16px' }}>
-                Para eventos com mapa de assentos, você pode escolher lugares específicos na próxima etapa.
+                {selectedType?.available > 0 ? `${selectedType.available} ingressos disponíveis` : 'Ingressos esgotados para este tipo'}
               </p>
               <div className="flex justify-between items-center">
                 <div>
                   <span className="text-muted text-sm">Total</span>
-                  <div className="price">R$ {total}</div>
+                  <div className="price">{formatCurrency(total)}</div>
                 </div>
-                <Link to="/checkout" className="btn btn-primary btn-lg">Continuar</Link>
+                <button onClick={handleCheckout} className="btn btn-primary btn-lg" disabled={soldOut || !selectedType || selectedType.available < quantity}>
+                  Continuar
+                </button>
               </div>
             </div>
           </div>
@@ -90,7 +113,7 @@ export default function EventDetail() {
             <div>
               <h2 style={{ marginBottom: '16px' }}>Sobre o evento</h2>
               <p className="text-muted" style={{ marginBottom: '16px' }}>{event.description}</p>
-              {event.info && (
+              {event.info && typeof event.info === 'object' && Array.isArray(event.info) && (
                 <>
                   <h4 style={{ margin: '24px 0 12px' }}>Informações importantes</h4>
                   <ul className="text-muted text-sm" style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -104,39 +127,7 @@ export default function EventDetail() {
               <div style={{ background: 'var(--color-background)', borderRadius: '12px', padding: '24px' }}>
                 <div style={{ height: '8px', background: 'var(--color-text-muted)', borderRadius: '4px', marginBottom: '24px', opacity: 0.3 }}></div>
                 <div style={{ textAlign: 'center', marginBottom: '16px' }} className="text-xs text-muted">PALCO</div>
-                {SEAT_ROWS.map(row => (
-                  <div key={row} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ width: '24px', textAlign: 'center', fontSize: '12px', color: 'var(--color-text-muted)' }}>{row}</span>
-                    {Array.from({ length: SEATS_PER_ROW }, (_, i) => i + 1).map(col => {
-                      const occupied = isOccupied(row, col);
-                      const selected = isSelected(row, col);
-                      return (
-                        <button
-                          key={col}
-                          type="button"
-                          disabled={occupied}
-                          onClick={() => toggleSeat(row, col)}
-                          style={{
-                            width: '28px', height: '28px', borderRadius: '6px', border: '1px solid var(--color-border)',
-                            background: occupied ? 'var(--color-border)' : selected ? 'var(--color-primary)' : 'var(--color-surface)',
-                            cursor: occupied ? 'not-allowed' : 'pointer', opacity: occupied ? 0.6 : 1
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                ))}
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '24px' }} className="text-xs">
-                  <span className="flex items-center gap-2">
-                    <span style={{ width: '16px', height: '16px', borderRadius: '4px', border: '1px solid var(--color-border)', display: 'inline-block', background: 'var(--color-surface)' }}></span> Disponível
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span style={{ width: '16px', height: '16px', borderRadius: '4px', border: '1px solid var(--color-border)', display: 'inline-block', background: 'var(--color-primary)' }}></span> Selecionado
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span style={{ width: '16px', height: '16px', borderRadius: '4px', border: '1px solid var(--color-border)', display: 'inline-block', background: 'var(--color-border)' }}></span> Ocupado
-                  </span>
-                </div>
+                <p className="text-sm text-muted text-center">Mapa de assentos em breve.</p>
               </div>
             </div>
           </div>
