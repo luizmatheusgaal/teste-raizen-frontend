@@ -11,13 +11,13 @@ function getToken() {
 function extractErrorMessage(data, status) {
   if (data && typeof data === 'object') {
     if (typeof data.msg === 'string') {
-      return data.msg;
+      return stripFieldPrefix(data.msg);
     }
     if (typeof data.detail === 'string') {
-      return data.detail;
+      return stripFieldPrefix(data.detail);
     }
     if (typeof data.message === 'string') {
-      return data.message;
+      return stripFieldPrefix(data.message);
     }
     const messages = [];
     for (const value of Object.values(data)) {
@@ -28,10 +28,17 @@ function extractErrorMessage(data, status) {
       }
     }
     if (messages.length) {
-      return messages.join(' ');
+      return stripFieldPrefix(messages.join(' '));
     }
   }
   return `Erro ${status}`;
+}
+
+function stripFieldPrefix(message) {
+  if (typeof message === 'string' && message.includes(': ')) {
+    return message.split(': ').slice(1).join(': ');
+  }
+  return message;
 }
 
 export async function apiRequest(path, options = {}) {
