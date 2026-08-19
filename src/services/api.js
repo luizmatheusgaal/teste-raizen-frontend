@@ -9,13 +9,16 @@ function getToken() {
 }
 
 function extractErrorMessage(data, status) {
-  if (data.detail) {
-    return typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
-  }
-  if (data.message) {
-    return data.message;
-  }
-  if (typeof data === 'object' && data !== null) {
+  if (data && typeof data === 'object') {
+    if (typeof data.msg === 'string') {
+      return data.msg;
+    }
+    if (typeof data.detail === 'string') {
+      return data.detail;
+    }
+    if (typeof data.message === 'string') {
+      return data.message;
+    }
     const messages = [];
     for (const value of Object.values(data)) {
       if (Array.isArray(value)) {
@@ -52,10 +55,16 @@ export async function apiRequest(path, options = {}) {
 
   if (!response.ok) {
     const message = extractErrorMessage(data, response.status);
-    notifyToast(message, 'error', 4000);
     const error = new Error(message);
     error.status = response.status;
     error.data = data;
+
+    if (response.status === 403) {
+      window.location.replace('/');
+      throw error;
+    }
+
+    notifyToast(message, 'error', 4000);
     throw error;
   }
 
