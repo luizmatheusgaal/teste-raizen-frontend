@@ -48,6 +48,24 @@ Para recriar a imagem:
 docker compose up -d --build
 ```
 
+## Deploy na Vercel
+
+1. Importe o repositório no dashboard da Vercel.
+2. **Framework Preset**: `Vite`
+3. **Build Command**: `npm run build`
+4. **Output Directory**: `dist`
+5. **Install Command**: `npm install`
+6. Adicione a variável de ambiente `VITE_API_BASE_URL` apontando para o backend de produção, por exemplo:
+   ```
+   VITE_API_BASE_URL=https://seu-backend.railway.app/api/v1
+   ```
+7. O arquivo `vercel.json` já configura o roteamento SPA e cache de assets.
+
+> **Importante**: o backend precisa permitir o domínio da Vercel via `CORS_ALLOWED_ORIGINS`. Exemplo:
+> ```
+> CORS_ALLOWED_ORIGINS=https://seu-frontend.vercel.app,https://www.seudominio.com
+> ```
+
 ## Build e lint
 
 ```bash
