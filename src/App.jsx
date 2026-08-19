@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import EventDetail from './pages/EventDetail';
@@ -17,11 +18,11 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/eventos/:id" element={<EventDetail />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/meus-ingressos" element={<MyTickets />} />
-          <Route path="/validar" element={<DoorValidation />} />
-          <Route path="/criar-evento" element={<CreateEvent />} />
-          <Route path="/organizador" element={<OrganizerDashboard />} />
+          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/meus-ingressos" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
+          <Route path="/validar" element={<ProtectedRoute allowedRoles={['door']}><DoorValidation /></ProtectedRoute>} />
+          <Route path="/criar-evento" element={<ProtectedRoute allowedRoles={['organizer']}><CreateEvent /></ProtectedRoute>} />
+          <Route path="/organizador" element={<ProtectedRoute allowedRoles={['organizer']}><OrganizerDashboard /></ProtectedRoute>} />
         </Routes>
       </Layout>
     </BrowserRouter>

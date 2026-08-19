@@ -20,15 +20,16 @@ export default function DoorValidation() {
       setResult({
         type: 'valid',
         title: 'Ingresso válido',
-        message: `${data.ticket.event} — ${data.ticket.type}\nCliente: ${data.ticket.owner}\nCódigo: ${data.ticket.code}`
+        message: data.msg || `${data.ticket.event} — ${data.ticket.type}\nCliente: ${data.ticket.owner}\nCódigo: ${data.ticket.code}`
       });
       setStats(s => ({ ...s, validated: s.validated + 1 }));
     } catch (err) {
-      const isUsed = err.data?.message?.includes('utilizado');
+      const backendMsg = err.data?.msg || err.data?.message || err.message;
+      const isUsed = backendMsg?.includes('utilizado');
       setResult({
         type: isUsed ? 'used' : 'invalid',
         title: isUsed ? 'Ingresso já utilizado' : 'Ingresso inválido',
-        message: err.data?.message || 'Código não encontrado para este evento.'
+        message: backendMsg || 'Código não encontrado para este evento.'
       });
       if (!isUsed) setStats(s => ({ ...s, refused: s.refused + 1 }));
     } finally {
