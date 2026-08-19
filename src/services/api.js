@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const PROD_URL = 'https://teste-raizen-backend.vercel.app/api/v1';
+const rawUrl = import.meta.env.VITE_API_BASE_URL || PROD_URL;
+const API_BASE_URL = /^https?:\/\//.test(rawUrl) ? rawUrl : PROD_URL;
 
 function getToken() {
   return localStorage.getItem('verzel_token');
