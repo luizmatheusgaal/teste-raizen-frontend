@@ -1,91 +1,122 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { events } from '../data/events';
-
-const catalog = events.map(e => ({ id: e.id, title: e.title, category: e.category, gradient: e.gradient }));
-const venues = ['Arena Verzel', 'Cine Verzel', 'Teatro Positivo', 'Estádio Municipal'];
+import { api } from '../services/api.js';
 
 export default function CreateEvent() {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState(1);
+  const [categories, setCategories] = useState([]);
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({
-    datetime: '', venue: 'Arena Verzel', capacity: 5000, price: 120, saleType: 'map', status: 'draft', description: ''
+    title: '',
+    description: '',
+    category_id: '',
+    venue_id: '',
+    starts_at: '',
+    ends_at: '',
+    min_age: 0,
+    price: 0,
+    capacity: 1000,
+    status: 'published',
   });
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    async function load() {
+      try {
+        const [catData, venueData] = await Promise.all([api.listCategories(), api.listVenues()]);
+        const cats = catData.results || catData;
+        const vs = venueData.results || venueData;
+        setCategories(cats);
+        setVenues(vs);
+        if (cats.length) setForm(f => ({ ...f, category_id: cats[0].id }));
+        if (vs.length) setForm(f => ({ ...f, venue_id: vs[0].id }));
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+    load();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Evento publicado com sucesso!');
-    navigate('/organizador');
+    setError('');
+    setLoading(true);
+
+    try {
+      const event = await api.createEvent({
+        title: form.title,
+        description: form.description,
+        category_id: Number(form.category_id),
+        venue_id: Number(form.venue_id),
+        starts_at: new Date(form.starts_at).toISOString(),
+        ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null,
+        min_age: Number(form.min_age),
+        status: form.status,
+      });
+
+      await api.createTicketType({
+        event: event.id,
+        name: 'Pista',
+        price: Number(form.price),
+        capacity: Number(form.capacity),
+        description: 'Ingresso geral',
+      });
+
+      navigate('/organizador');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <section className="section">
       <div className="container" style={{ maxWidth: '960px' }}>
         <h1 style={{ marginBottom: '8px' }}>Criar novo evento</h1>
-        <p className="text-muted" style={{ marginBottom: '32px' }}>Escolha um show ou filme do catálogo e defina data, local e preço</p>
+        <p className="text-muted" style={{ marginBottom: '32px' }}>Preencha as informações do evento e defina o ingresso principal</p>
 
-        <div className="card" style={{ padding: '32px', marginBottom: '24px' }}>
-          <h4 style={{ marginBottom: '16px' }}>1. Buscar no catálogo externo</h4>
-          <div className="flex gap-2" style={{ marginBottom: '16px' }}>
-            <select className="form-select" style={{ width: '160px', flex: 'none' }}>
-              <option>Ticketmaster</option>
-              <option>Sympla</option>
-              <option>Ingresso.com</option>
-            </select>
-            <input className="form-input" type="text" placeholder="Buscar show ou filme..." />
-            <button className="btn btn-primary">Buscar</button>
-          </div>
-          <div className="grid grid-3">
-            {catalog.map(item => (
-              <div
-                key={item.id}
-                onClick={() => setSelected(item.id)}
-                className="card"
-                style={{
-                  cursor: 'pointer',
-                  border: selected === item.id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)'
-                }}
-              >
-                <div className="card-image" style={{ background: item.gradient, minHeight: '140px' }}></div>
-                <div className="card-body">
-                  <h4 className="card-title" style={{ fontSize: '16px' }}>{item.title}</h4>
-                  <p className="text-xs text-muted">{item.category}</p>
-                  {selected === item.id && <span className="badge badge-primary">Selecionado</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {error && <p className="text-danger" style={{ marginBottom: '16px' }}>{error}</p>}
 
         <div className="card" style={{ padding: '32px' }}>
-          <h4 style={{ marginBottom: '24px' }}>2. Configurar evento</h4>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-2" style={{ gap: '16px' }}>
               <div className="form-group">
-                <label className="form-label">Data e hora</label>
-                <input className="form-input" type="datetime-local" value={form.datetime} onChange={(e) => setForm({ ...form, datetime: e.target.value })} required />
+                <label className="form-label">Título</label>
+                <input className="form-input" type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Categoria</label>
+                <select className="form-select" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} required>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Local / Venue</label>
-                <select className="form-select" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })}>
-                  {venues.map(v => <option key={v} value={v}>{v}</option>)}
+                <select className="form-select" value={form.venue_id} onChange={(e) => setForm({ ...form, venue_id: e.target.value })} required>
+                  {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Capacidade total</label>
-                <input className="form-input" type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} />
+                <label className="form-label">Data e hora de início</label>
+                <input className="form-input" type="datetime-local" value={form.starts_at} onChange={(e) => setForm({ ...form, starts_at: e.target.value })} required />
               </div>
               <div className="form-group">
-                <label className="form-label">Preço base (R$)</label>
-                <input className="form-input" type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+                <label className="form-label">Término (opcional)</label>
+                <input className="form-input" type="datetime-local" value={form.ends_at} onChange={(e) => setForm({ ...form, ends_at: e.target.value })} />
               </div>
               <div className="form-group">
-                <label className="form-label">Tipo de venda</label>
-                <select className="form-select" value={form.saleType} onChange={(e) => setForm({ ...form, saleType: e.target.value })}>
-                  <option value="map">Mapa de assentos</option>
-                  <option value="free">Livre</option>
-                  <option value="numbered">Lugares numerados</option>
-                </select>
+                <label className="form-label">Idade mínima</label>
+                <input className="form-input" type="number" value={form.min_age} onChange={(e) => setForm({ ...form, min_age: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Preço do ingresso Pista (R$)</label>
+                <input className="form-input" type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Capacidade</label>
+                <input className="form-input" type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} required />
               </div>
               <div className="form-group">
                 <label className="form-label">Status inicial</label>
@@ -97,11 +128,13 @@ export default function CreateEvent() {
             </div>
             <div className="form-group">
               <label className="form-label">Descrição</label>
-              <textarea className="form-textarea" rows="4" placeholder="Descreva o evento..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}></textarea>
+              <textarea className="form-textarea" rows="4" placeholder="Descreva o evento..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required></textarea>
             </div>
             <div className="flex justify-between mt-6">
-              <button type="button" className="btn btn-secondary">Salvar rascunho</button>
-              <button type="submit" className="btn btn-primary">Publicar evento</button>
+              <button type="button" className="btn btn-secondary" onClick={() => navigate('/organizador')}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Salvando...' : 'Publicar evento'}
+              </button>
             </div>
           </form>
         </div>

@@ -1,26 +1,38 @@
 import { useState } from 'react';
+import { api } from '../services/api.js';
 
 export default function DoorValidation() {
   const [code, setCode] = useState('');
   const [result, setResult] = useState(null);
-  const [stats] = useState({ validated: 42, refused: 3 });
+  const [stats, setStats] = useState({ validated: 42, refused: 3 });
+  const [loading, setLoading] = useState(false);
 
-  const handleValidate = (e) => {
+  const handleValidate = async (e) => {
     e.preventDefault();
     if (!code) {
       setResult({ type: 'invalid', message: 'Digite um código válido.' });
       return;
     }
-    if (code === 'VER-2026-001-A') {
+
+    setLoading(true);
+    try {
+      const data = await api.validateTicket(code);
       setResult({
         type: 'valid',
         title: 'Ingresso válido',
-        message: `Festival Verano 2026 — Pista\nCliente: João Silva\nCódigo: ${code}`
+        message: `${data.ticket.event} — ${data.ticket.type}\nCliente: ${data.ticket.owner}\nCódigo: ${data.ticket.code}`
       });
-    } else if (code.startsWith('VER-2026-004')) {
-      setResult({ type: 'used', title: 'Ingresso já utilizado', message: `Código: ${code}` });
-    } else {
-      setResult({ type: 'invalid', title: 'Ingresso inválido', message: 'Código não encontrado para este evento.' });
+      setStats(s => ({ ...s, validated: s.validated + 1 }));
+    } catch (err) {
+      const isUsed = err.data?.message?.includes('utilizado');
+      setResult({
+        type: isUsed ? 'used' : 'invalid',
+        title: isUsed ? 'Ingresso já utilizado' : 'Ingresso inválido',
+        message: err.data?.message || 'Código não encontrado para este evento.'
+      });
+      if (!isUsed) setStats(s => ({ ...s, refused: s.refused + 1 }));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,13 +73,15 @@ export default function DoorValidation() {
               <input
                 className="form-input"
                 type="text"
-                placeholder="VER-2026-001-A"
+                placeholder="1-1-001"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 style={{ textAlign: 'center', letterSpacing: '2px' }}
               />
             </div>
-            <button type="submit" className="btn btn-primary btn-lg" style={{ minWidth: '200px' }}>Validar</button>
+            <button type="submit" className="btn btn-primary btn-lg" style={{ minWidth: '200px' }} disabled={loading}>
+              {loading ? 'Validando...' : 'Validar'}
+            </button>
           </form>
         </div>
 

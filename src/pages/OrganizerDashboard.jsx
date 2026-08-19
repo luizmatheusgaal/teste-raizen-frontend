@@ -1,14 +1,44 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { organizerEvents } from '../data/events';
-
-const stats = [
-  { label: 'Eventos publicados', value: '5' },
-  { label: 'Ingressos vendidos', value: '1.240' },
-  { label: 'Receita bruta', value: 'R$ 89K' },
-  { label: 'Taxa de validação', value: '98%' }
-];
+import { api } from '../services/api.js';
+import { useAuth } from '../hooks/useAuth.js';
+import { formatDate } from '../services/format.js';
 
 export default function OrganizerDashboard() {
+  const { user } = useAuth();
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await api.listEvents();
+        const all = data.results || data;
+        setEvents(all.filter(e => e.organizer === user?.id));
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [user]);
+
+  const totalSold = events.reduce((acc, e) => acc + (e.sold || 0), 0);
+  const totalCapacity = events.reduce((acc, e) => acc + (e.capacity || 0), 0);
+  const revenue = events.reduce((acc, e) => acc + (e.revenue || 0), 0);
+
+  const stats = [
+    { label: 'Eventos publicados', value: events.filter(e => e.status === 'published').length },
+    { label: 'Ingressos vendidos', value: totalSold },
+    { label: 'Receita bruta', value: `R$ ${revenue.toLocaleString('pt-BR')}` },
+    { label: 'Taxa de validação', value: totalCapacity ? `${Math.round((totalSold / totalCapacity) * 100)}%` : '0%' }
+  ];
+
+  if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando...</p></div></section>;
+  if (error) return <section className="section"><div className="container"><p className="text-danger">{error}</p></div></section>;
+
   return (
     <section className="section">
       <div className="container">
@@ -31,11 +61,7 @@ export default function OrganizerDashboard() {
         <div className="card" style={{ padding: '32px' }}>
           <div className="flex justify-between items-center" style={{ marginBottom: '24px' }}>
             <h3>Meus eventos</h3>
-            <select className="form-select" style={{ width: '140px' }}>
-              <option>Todos</option>
-              <option>Publicados</option>
-              <option>Rascunho</option>
-            </select>
+            <Link to="/criar-evento" className="btn btn-primary btn-sm">Criar evento</Link>
           </div>
 
           <table className="w-full" style={{ borderCollapse: 'collapse' }}>
@@ -49,14 +75,14 @@ export default function OrganizerDashboard() {
               </tr>
             </thead>
             <tbody>
-              {organizerEvents.map(event => (
+              {events.map(event => (
                 <tr key={event.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                   <td style={{ padding: '16px 0' }}>
                     <strong>{event.title}</strong>
-                    <p className="text-muted text-sm">{event.location}</p>
+                    <p className="text-muted text-sm">{event.venue?.city}, {event.venue?.state}</p>
                   </td>
-                  <td style={{ padding: '16px 0' }}>{event.date}</td>
-                  <td style={{ padding: '16px 0' }}>{event.capacity ? `${event.sold} / ${event.capacity}` : '—'}</td>
+                  <td style={{ padding: '16px 0' }}>{formatDate(event.starts_at)}</td>
+                  <td style={{ padding: '16px 0' }}>{event.sold ?? 0} / {event.capacity ?? '—'}</td>
                   <td style={{ padding: '16px 0' }}>
                     <span className={`badge ${event.status === 'published' ? 'badge-success' : 'badge-primary'}`}>
                       {event.status === 'published' ? 'Publicado' : 'Rascunho'}
@@ -69,6 +95,8 @@ export default function OrganizerDashboard() {
               ))}
             </tbody>
           </table>
+
+          {events.length === 0 && <p className="text-muted text-center mt-4">Nenhum evento criado ainda.</p>}
         </div>
       </div>
     </section>
