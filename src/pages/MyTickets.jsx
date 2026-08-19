@@ -1,31 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { api } from '../services/api.js';
 import { formatFullDate, formatTime } from '../services/format.js';
 
-function QRCode({ used }) {
+function TicketQR({ code, used, canvasRef }) {
   return (
-    <svg
-      width="96"
-      height="96"
-      viewBox="0 0 96 96"
-      fill={used ? '#94a3b8' : '#1e293b'}
-      style={{ opacity: used ? 0.5 : 1 }}
-    >
-      <rect x="0" y="0" width="32" height="32" />
-      <rect x="64" y="0" width="32" height="32" />
-      <rect x="0" y="64" width="32" height="32" />
-      <rect x="40" y="40" width="16" height="16" />
-      <rect x="64" y="64" width="12" height="12" />
-      <rect x="84" y="64" width="12" height="12" />
-      <rect x="64" y="84" width="12" height="12" />
-      <rect x="84" y="84" width="12" height="12" />
-    </svg>
+    <QRCodeCanvas
+      ref={canvasRef}
+      value={code}
+      size={128}
+      bgColor={used ? '#f1f5f9' : '#ffffff'}
+      fgColor={used ? '#94a3b8' : '#1e293b'}
+      level="M"
+      style={{ opacity: used ? 0.5 : 1, borderRadius: '8px' }}
+    />
   );
 }
 
 export default function MyTickets() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const canvasRefs = useRef({});
 
   useEffect(() => {
     async function load() {
@@ -40,6 +35,37 @@ export default function MyTickets() {
     }
     load();
   }, []);
+
+  const handleDownload = (ticket) => {
+    const canvas = canvasRefs.current[ticket.id];
+    if (!canvas) return;
+
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `ingresso-${ticket.code}.png`;
+    link.click();
+  };
+
+  const handleShare = async (ticket) => {
+    const event = ticket.ticket_type?.event;
+    const text = `Ingresso para ${event?.title || 'evento'}\nCódigo: ${ticket.code}\nSetor: ${ticket.ticket_type?.name}\n${formatFullDate(event?.starts_at)}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Meu ingresso', text });
+        return;
+      } catch {
+        // fall through to clipboard
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Código do ingresso copiado!');
+    } catch {
+      // ignore
+    }
+  };
 
   if (loading) return <section className="section"><div className="container"><p className="text-muted">Carregando ingressos...</p></div></section>;
 
@@ -74,14 +100,14 @@ export default function MyTickets() {
                   <p className="text-sm mt-4"><strong>Setor:</strong> {ticket.ticket_type?.name} • <strong>Lugar:</strong> {ticket.seat || 'Livre'}</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                  <QRCode code={ticket.code} used={used} />
+                  <TicketQR code={ticket.code} used={used} canvasRef={el => { canvasRefs.current[ticket.id] = el; }} />
                   {!used && <p className="text-xs text-muted" style={{ marginTop: '8px' }}>Apresente na portaria</p>}
                 </div>
               </div>
               {!used && (
                 <div style={{ borderTop: '1px solid var(--color-border)', marginTop: '20px', paddingTop: '16px', display: 'flex', gap: '12px' }}>
-                  <button className="btn btn-secondary btn-sm">Compartilhar ingresso</button>
-                  <button className="btn btn-ghost btn-sm">Baixar PDF</button>
+                  <button className="btn btn-secondary btn-sm" onClick={() => handleShare(ticket)}>Compartilhar ingresso</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => handleDownload(ticket)}>Baixar QR</button>
                 </div>
               )}
             </div>

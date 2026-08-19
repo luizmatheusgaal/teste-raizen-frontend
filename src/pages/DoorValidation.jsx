@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../services/api.js';
+import QrScanner from '../components/QrScanner.jsx';
 
 export default function DoorValidation() {
   const [code, setCode] = useState('');
@@ -7,16 +8,15 @@ export default function DoorValidation() {
   const [stats, setStats] = useState({ validated: 42, refused: 3 });
   const [loading, setLoading] = useState(false);
 
-  const handleValidate = async (e) => {
-    e.preventDefault();
-    if (!code) {
-      setResult({ type: 'invalid', message: 'Digite um código válido.' });
+  const handleValidate = async (codeValue) => {
+    if (!codeValue) {
+      setResult({ type: 'invalid', message: 'Digite ou escaneie um código válido.' });
       return;
     }
 
     setLoading(true);
     try {
-      const data = await api.validateTicket(code);
+      const data = await api.validateTicket(codeValue);
       setResult({
         type: 'valid',
         title: 'Ingresso válido',
@@ -37,6 +37,16 @@ export default function DoorValidation() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleValidate(code);
+  };
+
+  const handleScan = (scannedCode) => {
+    setCode(scannedCode);
+    handleValidate(scannedCode);
+  };
+
   const resultClass = {
     valid: { background: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)' },
     used: { background: 'rgba(245, 158, 11, 0.1)', color: 'var(--color-warning)' },
@@ -52,23 +62,11 @@ export default function DoorValidation() {
         </div>
 
         <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
-          <div style={{
-            width: '320px', height: '240px', border: '2px dashed var(--color-primary)',
-            borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(22, 163, 74, 0.04)', margin: '0 auto 24px'
-          }}>
-            <div>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M3 9h18M9 21V9" />
-              </svg>
-              <p className="text-sm text-muted" style={{ marginTop: '12px' }}>Aponte a câmera para o QR</p>
-            </div>
-          </div>
+          <QrScanner onScan={handleScan} />
 
           <p className="text-xs text-muted" style={{ marginBottom: '16px' }}>— ou —</p>
 
-          <form onSubmit={handleValidate}>
+          <form onSubmit={handleSubmit}>
             <div className="form-group" style={{ maxWidth: '320px', margin: '0 auto 16px' }}>
               <label className="form-label">Digite o código do ingresso</label>
               <input
